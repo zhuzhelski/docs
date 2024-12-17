@@ -1,21 +1,28 @@
-# Change custody address
+# Change Custody Address
 
-Accounts are owned by custody address which is an Ethereum address on OP Mainnet.
+Accounts are owned by a custody address, which is an Ethereum address on OP Mainnet.
 
 A user may want to change this address for security reasons or to transfer ownership of the entire account.
 
-### Requirements
+---
 
-- An ETH wallet that owns the account on OP Mainnet, with some ETH.
-- An Ethereum provider URL for OP Mainnet (e.g. via [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/) or [QuickNode](https://www.quicknode.com/)).
+## Requirements
 
-### Change Custody Address
+- An ETH wallet that owns the account on OP Mainnet, with some ETH.  
+- An Ethereum provider URL for OP Mainnet (e.g., via [Alchemy](https://www.alchemy.com/), [Infura](https://www.infura.io/), or [QuickNode](https://www.quicknode.com/)).
 
-Call the `transfer` function on the Id Registry contract. The receiving address must provide an EIP-712 signature accepting the transfer.
+---
 
-::: code-group
+## Change Custody Address
 
-```ts [@farcaster/hub-web]
+Call the `transfer` function on the **Id Registry contract**. The receiving address must provide an **EIP-712 signature** accepting the transfer.
+
+---
+
+### Code Example
+
+#### `@farcaster/hub-web`
+```ts
 import { ViemWalletEip712Signer } from '@farcaster/hub-web';
 import { walletClient, account } from './clients.ts';
 import { readNonce, getDeadline } from './helpers.ts';
@@ -24,7 +31,7 @@ const nonce = await readNonce();
 const deadline = getDeadline();
 
 const eip712Signer = new ViemWalletEip712Signer(walletClient);
-const signature = await eip712signer.signTransfer({
+const signature = await eip712Signer.signTransfer({
   fid: 1n,
   to: account,
   nonce,
@@ -38,9 +45,6 @@ const { request: transferRequest } = await publicClient.simulateContract({
 });
 
 await walletClient.writeContract(transferRequest);
-```
-
-```ts [Viem]
 import {
   ID_REGISTRY_EIP_712_TYPES,
   idRegistryABI,
@@ -51,6 +55,7 @@ import { readNonce, getDeadline } from './helpers.ts';
 
 const nonce = await readNonce();
 const deadline = getDeadline();
+
 const IdContract = {
   abi: idRegistryABI,
   address: ID_GATEWAY_ADDRESS,
@@ -68,9 +73,6 @@ const signature = await walletClient.signTypedData({
     deadline,
   },
 });
-```
-
-```ts [helpers.ts]
 import { ID_REGISTRY_ADDRESS, idRegistryABI } from '@farcaster/hub-web';
 import { publicClient, account } from './clients.ts';
 
@@ -88,7 +90,6 @@ export const readNonce = async () => {
     args: [account],
   });
 };
-```
 
 <<< @/examples/contracts/clients.ts
 
@@ -96,7 +97,7 @@ export const readNonce = async () => {
 
 ::: warning
 Transferring a FID does not reset its recovery address. To transfer a FID and update its recovery address,
-call [`transferAndChangeRecovery`](/reference/contracts/reference/id-registry#transferandchangerecovery).
+call [transferAndChangeRecovery](/reference/contracts/reference/id-registry#transferandchangerecovery).
 :::
 
 See the [Id Registry](/reference/contracts/reference/id-registry#transfer) section for more
